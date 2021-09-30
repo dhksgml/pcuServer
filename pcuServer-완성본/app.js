@@ -32,19 +32,27 @@ app.post('/login',async (req,res,next)=>{
     //3. req.body.id가 db에 있는지 확인 ->
     //4. 3번의 id랑 pw 일치 확인
     //5. 일치하면 닉네임 반환 or "Error"반환
-        var searchGame = await User.findOne({ where: { gameName: req.body.gameName } });
-        if(searchGame.gameName)
+        var searchInfo = await User.findOne({ 
+            where: { [Op.and]:{gameName: req.body.gameName,
+                userId: req.body.userId, 
+                password: req.body.password} 
+            } 
+        });
+        if(searchInfo.gameName)
         {
             // console.log("게임이름 같음");
-            var searchID = await User.findOne({ where:{userId: req.body.userId}});
-            if(searchID){
+            // var searchID = await User.findOne({ where:{userId: req.body.userId}});
+            // if(searchID){
+                console.log(searchInfo.userId);
+            if(searchInfo.userId){
                 // console.log("아이디가 있습니다.");
                 var searchPassword = await User.findOne({
                     where:{[Op.and]:{password: req.body.password,userId: req.body.userId}}
                 });                    
                 if(searchPassword){
                     // console.log("로그인 성공!");
-                    res.send(req.body.userId);
+                    res.send(req.body.gameName+": "+req.body.userId);
+                    
                 }
                 else{
                     // console.log("비밀번호가 다릅니다.");
@@ -72,13 +80,16 @@ app.post('/register',async (req,res,next)=>{
     //4. 결과 true false 반환
 
     try{
-        const exUser = await User.create({
-            gameName: req.body.gameName,
-            userId: req.body.userId,
-            password: req.body.password
-        });
-            
-        res.send(true);
+        var searchGame = await User.findOne({ where: { [Op.and]:{gameName: req.body.gameName,userId: req.body.userId} } });
+        if(!searchGame){
+            const exUser = await User.create({
+                gameName: req.body.gameName,
+                userId: req.body.userId,
+                password: req.body.password
+            });
+        }
+        
+        res.send(null);
     }
     catch(error)
     {

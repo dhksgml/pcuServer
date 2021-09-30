@@ -7,7 +7,7 @@ module.exports = (sequelize,DataTypes)=>{
         userId:{
             type: DataTypes.STRING(40),
             allowNull: true,
-            unique: true,
+            // unique: true,
         },
         password: {
             type: DataTypes.STRING(100),
